@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp</title>
+</head>
+
+<body>
+    <h1>Chatting</h1>
+    <div class="di">
+        <h4>Enter your name </h4>
+        <input type="text" id="name" placeholder="Enter your name" />
+        <button onclick="setName()">OK</button>
+    </div>
+    <div class="chatting">
+        <h4>Continue Chatting </h4>
+        <input type="text" placeholder="Enter Somethings" id="message" />
+        <button id="sendBtn">Send</button>
+        <div class="chats"></div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let username = "";
+        const socket = io();
+        const chatting = document.querySelector(".chatting");
+        chatting.hidden = true;
+        const sendBtn = document.getElementById('sendBtn');
+        const chat = document.querySelector(".chats");
+        const messageInput = document.getElementById('message');
+        const name = document.getElementById("name");
+        const reg = document.querySelector(".di");
+        function setName() {
+            username = name.value;
+            console.log(username);
+            reg.hidden = true;
+            chatting.hidden = false;
+
+        }
+        socket.on("message", (message) => {
+            const msg = document.createElement('p');
+            if (message.user != username) {
+                msg.innerText = `${message.user} : ${message.text}`;
+            }
+            chat.appendChild(msg);
+        });
+
+        sendBtn.addEventListener('click', (e) => {
+            const msg = messageInput.value;
+            messageInput.value = "";
+            socket.emit("user-message", { user: username, text: msg });
+        });
+
+    </script>
+</body>
+
+</html>
